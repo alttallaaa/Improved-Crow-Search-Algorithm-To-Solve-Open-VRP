@@ -1,20 +1,20 @@
-#include <iostream.h>   
-#include <conio.h>   
+#include <iostream.h>
+#include <conio.h>
 #include <iomanip.h>
-#include <stdlib.h>   
+#include <stdlib.h>
 #include <math.h>
 #include <stdio.h>
 #include <fstream.h>   
-#include <string.h>   
+#include <string.h>
 #include <time.h>
 
 
 //Variable ICSA
 int i,j,k,l,x_best,x_best_total,permut1,permut2,HASIL,pcrow[300][300],pcrowUpdate[300][300],pcrowPop[300][300],
     pcrowModif[300][300],rute[300][300],rute_modif[300][300],ruteUpdate[300][300],brute[300],jum_ken,
-    jum_pel,jum_crow,jum_pop,max_iterasi,pilihan1,nPop,iterasi ,iterasi1,pilihan,calon_induk[300];
+    jum_pel,jum_crow,jum_crow1,fl,jum_pop,max_iterasi,pilihan1,nPop,iterasi ,iterasi1,pilihan,calon_induk[300];
 float wmax=0.9,wmin=0.2,w_iter,fitness_relatif[300],cost_max, cost_min, temp,jarak_terpendek,jarak_terpendek_total,
-	jarak_terpanjang,kap_ken,permintaan,jum_crow1,fl,AP;
+	jarak_terpanjang,kap_ken,permintaan,AP;
 float jarak[300][300],memori[300][300],jarakPop[300][300],jarakModif[300][300],jarakUpdate[300][300],
     jarak_total[300],jarak_totalMemori[300],jarak_totalUpdate[300],jarak_totalPosisi[300],jarak_totalModif[300],
     jarak_totalPop[300],jarak_memoricrow[300],jarakposisicrow[300],jarak_tempuh[300][300],jarak_tempuh_modif[300][300],urutan[300],urutanft[300];
@@ -29,24 +29,25 @@ double fitness[300],fitness_kumulatif[300],ri[300],rj[300],jumCrow,crow_best[300
 char file[50],nama[50],namafile[50],pil;   
 
 random(int jum_crow,int jum_pel,double crow_awal[300][300],double memori_awal[300][300]);   
-transformasi(int j,int jum_pel, double crow_awal[300][300],int pcrow[300][300]);   
+transformasi(int j,int jum_pel, double crow_awal[300][300],int pcrow[300][300]);
 tentukan_rute(int j,int jum_pel,int pcrow[300][300],double data[300][300],int rute[300][300], float kap_ken, int brute[300],int jum_ken);   
 fungsi_tujuan(int j,int jum_pel,int pcrow[300][300],int rute[300][300], int brute[300],int jum_ken,
      float jarak_tempuh[300][300],float jarak_total[300],float jarak[300][300], double costKMpribadi[300],
-     double costKMsewa[300], double costv[300], double totcost[300]);   
+     double costKMsewa[300], double costv[300], double totcost[300]);
 x_terbaik(int jum_crow,double totcost_memori[300],float cost_min, int x_best);
 biaya_terkecil(int jum_crow,double totcost[300],float cost_min, int x_best);
 jarak_terbaik(int jumcrow,float jarak_total[300],float jarak_terpendek);
 void urutfitness(int jum_gagak);
 
-ofstream OVRP;   
-char jawab[5];   
-void main()   
-{   
-    int jum_ken1,jum_crow1,max_iterasi1,jum_pel,i,j;   
-
-    int benarr,pilihan,pilihan2;   
-    float jum_ken,jum_crow,max_iterasi,pilihan1;   
+ofstream OVRP;
+char jawab[5];
+void main()
+{
+    int jum_ken1,jum_crow1,fl,fl1,
+    	max_iterasi1,jum_pel,i,j;
+    int cek,tes,pilihdata,benar;
+    int benarr,pilihan,pilihan2;
+    float jum_ken, jum_crow, max_iterasi, pilihan1;
 
     clrscr();   
     ifstream OVRPICSA;
@@ -55,181 +56,198 @@ void main()
     cout<<"\n                    ALTTALLARIKA SATRIA BIMANTARA              ";
     cout<<"\n                           082111233045                        ";
     cout<<"\n             **Program Improved Crow Search Algorithm**        ";
-    cout<<"\n		**Untuk Menyelesaikan Open Vehicle Routing Problem**		 ";
+    cout<<"\n	  **Untuk Menyelesaikan Open Vehicle Routing Problem**		 ";
     cout<<"\n===============================================================";
 
     cout<<"\n Pilih: \n";
     cout<<" 1. Data Kecil\n";   
-    cout<<" 2. Data Sedang\n";   
-    cout<<" 3. Data Besar\n";   
+    cout<<" 2. Data Sedang\n";
+    cout<<" 3. Data Besar\n";
 
-    //Membuka data dengan format .txt   
-    do {   
-        cout<<"\n Pilihan : ";   
-        cin>>pilihan1;   
+    //Membuka data dengan format .txt
+    do {
+
+        cout<<"\n Pilihan : ";
+        cin>>pilihan1;
         pilihan=pilihan1;
-        pilihan2=pilihan1-pilihan;   
-        switch(pilihan)   
+        pilihan2=pilihan1-pilihan;
+        if (cin.fail()||pilihan<1||pilihan>3|| cin.peek() != '\n')
         {
-            case 1:   
+            cin.clear(); // Menghapus flag error
+            cin.ignore(999, '\n'); // Mengabaikan input yang salah
+            cout << "Inputan harus 1,2,3, mohon diulangi!" << endl;
+            continue; // Kembali ke awal loop
+        }
+        switch(pilihan)
+        {
+            case 1:
                 OVRPICSA.open("dataKecil.txt");
-                jum_pel=18;   
-                benarr=1;   
+                jum_pel=18;
+                benarr=1;
                 kap_ken=80;
-                jum_ken=3;   
-                break;   
-            case 2:   
+                jum_ken=3;
+                break;
+            case 2:
                 OVRPICSA.open("dataSedang.txt");
-                jum_pel=50;   
-                benarr=1;   
-                kap_ken=150;   
+                jum_pel=50;
+                benarr=1;
+                kap_ken=150;
                 jum_ken=4;
-                break;   
-            case 3:   
+                break;
+            case 3:
                 OVRPICSA.open("dataBesar.txt");
-                jum_pel=100; 
-                benarr=1;   
-                kap_ken=200;   
-                jum_ken=5;   
-                break;   
-            default:   
-                cout<<"Input yang anda masukkan salah"<<endl;   
-                benarr=0;   
-        }   
-    } while(benarr!=1||pilihan2!=0);   
-
-    for(i=0;i<=jum_pel;i++)   
-    {   
-        for(j=0;j<3;j++)   
-        {   
-            if(pilihan==1)   
+                jum_pel=100;
+                benarr=1;
+                kap_ken=200;
+                jum_ken=5;
+                break;
+            default:
+                cout<<"Inputan harus 1,2,3, mohon diulangi!"<<endl;
+                benarr=0;
+        } break;
+    	} while(true);
+    	for(i=0;i<=jum_pel;i++)
+    	{
+        for(j=1;j<=3;j++)
+        {
+            if(pilihan==1)
             {OVRPICSA>>data[i][j];}
-            else if(pilihan==2)   
+            else if(pilihan==2)
             {OVRPICSA>>data[i][j];}
-            else if(pilihan==3)   
+            else if(pilihan==3)
             {OVRPICSA>>data[i][j];}
-        }   
-    }   
+        }
+    	}
 
-    //INISIALISASI PARAMETER   
-    cout<<"===== INISIALISASI PARAMETER ====="<<endl;   
+    //INISIALISASI PARAMETER
+    cout<<"===== INISIALISASI PARAMETER ====="<<endl;
 
-    //MAKSIMUM ITERASI   
-    do   
-    {   
+    //MAKSIMUM ITERASI
+    do
+    {
         cout<<"Maksimum Iterasi (>=1)			: ";
-        cin>>max_iterasi;   
-        max_iterasi1=max_iterasi;   
-        if(max_iterasi1!=max_iterasi)   
-        {   
-            cout<<"inputan harus integer, mohon diulangi!!"<<endl;   
-        }   
-        if(max_iterasi<=0)   
-        {   
-            cout<<"Inputan salah, mohon ulangi!!"<<endl;   
-        }   
-    } while(max_iterasi<=0||max_iterasi1!=max_iterasi);   
+        cin>>max_iterasi;
+        max_iterasi1=max_iterasi;
+        tes=0;
+        if (cin.fail()||max_iterasi<=0|| cin.peek() != '\n'){
+        	cin.clear(); // Menghapus flag error
+        	cin.ignore(999, '\n'); // Mengabaikan input yang salah
+         tes+=1;
+        	cout<<"Inputan harus integer lebih dari 0, mohon diulangi !!"<<endl;
+         continue;
+        	} break;
+    } while(true);
 
-    //KAPASITAS MAKSIMUM KENDARAAN   
-    do   
-    {   
-        //cek kapasitas maksimum lebih besar kah dari semua permintaan pelanggan   
-        maksBeban=data[1][1];   
-        for(i=1;i<jum_pel;i++)   
-        {   
-            if(maksBeban<data[1][i])   
-            {   
-                maksBeban=data[1][i];   
-            }   
-        }   
-        if(maksBeban>kap_ken)   
-        {   
-            cout<<"Terdapat permintaan pelanggan yang melebihi kapasitas atau Inputan salah, mohon ulangi!!"<<endl;   
-        }   
-    } while(maksBeban>kap_ken);   
+    //KAPASITAS MAKSIMUM KENDARAAN
+    do
+    {
+        //cek kapasitas maksimum lebih besar kah dari semua permintaan pelanggan
+        maksBeban=data[1][1];
+        for(i=1;i<jum_pel;i++)
+        {
+            if(maksBeban<data[1][i])
+            {
+                maksBeban=data[1][i];
+            }
+        }
+        if(maksBeban>kap_ken)
+        {
+            cout<<"Terdapat permintaan pelanggan yang melebihi kapasitas atau Inputan salah, mohon ulangi!!"<<endl;
+        }
+    } while(maksBeban>kap_ken);
 
-    //JUMLAH KENDARAAN   
-    do   
-    {   
-        jum_ken1=jum_ken;   
-        total_permintaan=0;   
-        //cek jumlah kendaraan   
-        for(i=1;i<=jum_pel;i++)   
-        {   
-            total_permintaan=total_permintaan+data[1][i];   
-        }   
-        total_kapasitas_kendaraan=kap_ken*jum_ken;   
-        if(jum_ken!=jum_ken1)   
-        {   
-            cout<<"inputan harus integer, mohon diulangi!!"<<endl;   
-        }   
-        else   
-        {   
-            if(total_kapasitas_kendaraan<total_permintaan)   
-            {   
-                cout<<"Total Permintaan melebihi Total Kapasitas Kendaraan"<<endl;   
-            }   
-            if(jum_ken<=0)   
-            {   
-                cout<<"Inputan salah, mohon diulangi!!"<<endl;   
-            }   
-        }   
-    } while(jum_ken<=0||total_kapasitas_kendaraan<total_permintaan||jum_ken!=jum_ken1);   
+    //JUMLAH KENDARAAN
+    do
+    {
+        jum_ken1=jum_ken;
+        total_permintaan=0;
+        //cek jumlah kendaraan
+        for(i=1;i<=jum_pel;i++)
+        {
+            total_permintaan=total_permintaan+data[1][i];
+        }
+        total_kapasitas_kendaraan=kap_ken*jum_ken;
+        if(jum_ken!=jum_ken1)
+        {
+            cout<<"inputan harus integer, mohon diulangi!!"<<endl;
+        }
+        else
+        {
+            if(total_kapasitas_kendaraan<total_permintaan)
+            {
+                cout<<"Total Permintaan melebihi Total Kapasitas Kendaraan"<<endl;
+            }
+            if(jum_ken<=0)
+            {
+                cout<<"Inputan salah, mohon diulangi!!"<<endl;
+            }
+        }
+    } while(jum_ken<=0||total_kapasitas_kendaraan<total_permintaan||jum_ken!=jum_ken1);
 
-    //PARAMETER CROW SEARCH ALGORITHM   
-    //JUMLAH GAGAK   
-    do   
-    {   
-        cout<<"Jumlah Gagak (>=2)			: ";
-        cin>>jum_crow;   
-        jum_crow1=jum_crow;   
-        if(jum_crow!=jum_crow1)   
-        {   
-            cout<<"Inputan harus integer, mohon diulangi!"<<endl;   
-        }   
-        if(jum_crow<=1)   
-        {   
-            cout<<"Inputan salah, mohon diulangi!"<<endl;   
-        }   
-    } while(jum_crow<=1||jum_crow!=jum_crow1);   
+    //PARAMETER IMPROVED CROW SEARCH ALGORITHM
+    //JUMLAH GAGAK
+    do {
+        cout << "Jumlah Gagak (>=2)						: ";
+        cin >> jum_crow;
+        jum_crow1=jum_crow;
+        tes=0;
+        // Cek apakah input valid
+        if (cin.fail()||jum_crow<=1|| cin.peek() != '\n') {
+            cin.clear(); // Menghapus flag error
+            cin.ignore(999, '\n'); // Mengabaikan input yang salah
+            tes+=1;
+            cout << "Inputan harus integer lebih dari 2, mohon diulangi!" << endl;
+           	continue; // Kembali ke awal loop
+            }
+            break;
+    	} while(true);
 
     //PARAMETER PANJANG TERBANG
-    do   
-    {   
-        cout<<"Panjang Terbang (>=1)			: ";
-        cin>>fl;   
-        if(fl<1)   
-        {   
-            cout<<"Inputan salah, mohon diulangi!!";   
-        }   
-    } while(fl<1);   
+    do
+    {
+        cout<<"Panjang Terbang (>=1)						: ";
+        cin>>fl;
+        fl1=fl;
+        tes=0;
+        if (cin.fail()||fl<1|| cin.peek() != '\n') {
+            cin.clear(); // Menghapus flag error
+            cin.ignore(999, '\n'); // Mengabaikan input yang salah
+            tes+=1;
+            cout << "Inputan harus integer, mohon diulangi!" << endl;
+            continue; // Kembali ke awal loop
+        } break;
+        }while(true);
 
-    //PARAMETER PROBABILITAS KEWASPADAAN   
-    do   
-    {   
-        cout<<"Probabilitas Kewaspadaan (0-1)			: ";
-        cin>>AP;   
-        if(AP<=0||AP>1)   
-        {   
-            cout<<"Inputan salah, mohon diulangi!!";   
-        }   
-    } while(AP<=0||AP>1);     
+    //PARAMETER PROBABILITAS KEWASPADAAN
+    do
+    {
+        cout<<"Probabilitas Kewaspadaan (0-1)						: ";
+        cin>>AP;
+        tes=0;
+        if (cin.fail()|| AP<=0||AP>1|| cin.peek() != '\n') {
+            cin.clear(); // Menghapus flag error
+            cin.ignore(999, '\n'); // Mengabaikan input yang salah
+            tes+=1;
+            cout << "Inputan harus rentang 0 hingga 1, mohon diulangi!" << endl;
+            continue; // Kembali ke awal loop
+        	}break;
+        } while(true);
 
-    clrscr();   
-    cout<<"----------------------------------------"<<endl<<endl;   
-    cout<<"nama file: ";   
-    cin>>file;   
-    cout<<endl<<"nomer urut file: ";   
-    cin>>HASIL;   
-    cout<<endl<<endl<<endl;   
+    clrscr();
+    cout<<"----------------------------------------"<<endl<<endl;
+    cout<<"nama file: ";
+    cin>>file;
+    cout<<endl<<"nomer urut file: ";
+    cin>>HASIL;
+    cout<<endl<<endl<<endl;
 
-    //output notepad   
-    strcat(file," ke- ");        //menambah karakter ke dalam variabel   
-    strcpy(namafile,file);       //mengopi isi file ke nama file   
-    itoa(HASIL,nama,10);         //misal diinputkan HASIL=2202, membuat nama berisi 2202   
-    strcat(namafile,nama);     //menambah karakter nama ke dalam variabel namafile   
-    strcat(namafile,".txt"); //strcat berfungsi untuk menggabungkan 2 buah string (melakukan penggabungan variable namafile dan .txt)   
-    cout<<namafile<<endl<<endl;   
+    //output notepad
+    strcat(file," ke- ");        //menambah karakter ke dalam variabel
+    strcpy(namafile,file);       //mengopi isi file ke nama file
+    itoa(HASIL,nama,10);         //misal diinputkan HASIL=2202, membuat nama berisi 2202
+    strcat(namafile,nama);     //menambah karakter nama ke dalam variabel namafile
+    strcat(namafile,".txt"); //strcat berfungsi untuk menggabungkan 2 buah string (melakukan penggabungan variable namafile dan .txt)
+    cout<<namafile<<endl<<endl;
 
     OVRP.open(namafile);
     OVRP<<"\n===============================================================";
@@ -238,52 +256,53 @@ void main()
     OVRP<<"\n             **Program Improved Crow Search Algorithm**        ";
     OVRP<<"\n		**Untuk Menyelesaikan Open Vehicle Routing Problem**		 ";
     OVRP<<"\n===============================================================";
-    OVRP<<endl;   
-    OVRP<<endl;   
-    OVRP<<"----------Parameter yang digunakan ----------"<<endl;   
+    OVRP<<endl;
+    OVRP<<endl;
+    OVRP<<"----------Parameter yang digunakan ----------"<<endl;
     OVRP<<" Kapasitas Maksimum kendaraan		= "<<kap_ken<<endl;
     OVRP<<" Jumlah Maksimum Kendaraan 			= "<<jum_ken<<endl;
     OVRP<<" Maksimum Iterasi (>=2)				= "<<max_iterasi<<endl;
     OVRP<<" Jumlah Gagak (>=2)					= "<<jum_crow<<endl;
     OVRP<<" Panjang Terbang (>=1) 				= "<<fl<<endl;
     OVRP<<" Peluang Kewaspadaan (0-1) 			= "<<AP<<endl;
-    OVRP<<"\n =========== Data Pelanggan =========== : "<<endl;   
-    OVRP<<"\n Titik Koordinat : "<<endl;   
-    OVRP<<"X  "<<" Y "<<"  D" ;   
-    OVRP<<endl;   
+    OVRP<<"\n =========== Data Pelanggan =========== : "<<endl;
+    OVRP<<"\n Titik Koordinat : "<<endl;
+    OVRP<<"X  "<<" Y "<<"  D" ;
+    OVRP<<endl;
 
-    //Data pelanggan   
-    for(i=0;i<=jum_pel;i++)   
-    {   
-        for(j=0;j<3;j++)   
-        {   
-            OVRP<<data[i][j]<<"  ";   
-        }   
-        OVRP<<endl;   
-    }   
-    OVRP<<endl;   
-
-    //jarak tempuh   
-    for(i=0;i<=jum_pel;i++)   
+    //Data pelanggan
+    for(i=0;i<=jum_pel;i++)
     {
-        for(j=0;j<=jum_pel;j++)   
-        {   
-            if(pilihan1==1||pilihan1==2||pilihan1==3)   
-            {   
-                jarak_tempuh[i][j]=sqrt(pow((data[i][0]-data[j][0]),2)+pow((data[i][1]-data[j][1]),2));   
-            }   
-        }   
-    }   
-    OVRP<<endl;   
-
-    OVRP<<"Jarak antar pelanggan dan Jarak depot ke pelanggan = "<<endl; 
-
-    for(i=0;i<=jum_pel;i++)   
-    {   
-        for(j=0;j<=jum_pel;j++)   
+        for(j=0;j<3;j++)
         {
-            OVRP<<jarak_tempuh[i][j]<<"\t ";   
-        }   
+            OVRP<<data[i][j]<<"  ";
+        }
+        OVRP<<endl;
+    }
+    OVRP<<endl;
+
+    //jarak tempuh
+    for(i=0;i<=jum_pel;i++)
+    {
+        for(j=0;j<=jum_pel;j++)
+        {
+            if(pilihan1==1||pilihan1==2||pilihan1==3)
+            {
+                jarak_tempuh[i][j]=sqrt(pow((data[i][0]-data[j][0]),2)+
+                pow((data[i][1]-data[j][1]),2));
+            }
+        }
+    }
+    OVRP<<endl;
+
+    OVRP<<"Jarak antar pelanggan dan Jarak depot ke pelanggan = "<<endl;
+
+    for(i=0;i<=jum_pel;i++)
+    {
+        for(j=0;j<=jum_pel;j++)
+        {
+            OVRP<<jarak_tempuh[i][j]<<"\t ";
+        }
         OVRP<<endl;   
     }   
     OVRP<<endl;
@@ -334,10 +353,11 @@ void main()
     //OVRP<<"dengan Jarak Terdekat: "<<jarak_total[x_best]<<" dan Biaya Terkecil= "<<totcost[x_best]<<endl;
     fungsi_tujuan(x_best,jum_pel,pcrow,rute,brute,jum_ken,jarak_tempuh,jarak_totalMemori,memori,
         		costKMpribadiMemori,costKMsewaMemori,costvMemori,totcostMemori);
-    /*cout<<"Diperoleh Crow Terbaik sementara yaitu Crow ke "<<x_best<<endl;
+    cout<<"===================ITERASI KE-0==================="<<endl;
+    cout<<"Diperoleh Crow Terbaik sementara yaitu Crow ke "<<x_best<<endl;
     cout<<"dengan Jarak Terdekat: "<<jarak_total[x_best]<<" dan Biaya Terkecil= "<<totcost[x_best]<<endl;
-    cout<<endl;*/
-    //OVRP<<"Posisi Crow Terbaik Sementara :"<<endl;
+    cout<<endl;
+    cout<<"Posisi Crow Terbaik Sementara :"<<endl;
     for(int i=1;i<=jum_pel;i++)   
     {
         crow_best_sementara[i]=crow_awal[x_best][i];
@@ -353,7 +373,7 @@ void main()
         OVRP<<">>>>>>>>>>>>>>>>>>>> PROSES ITERASI KE "<<iterasi<<">>>>>>>>>>>>>>>>>>>>"<<endl;
         OVRP<<endl;
         OVRP<<" =========== Update Posisi Gagak =========== : "<<endl;
-        //cout<<">>>>>>>>>>>>>>>>>>>> PROSES ITERASI KE "<<iterasi<<">>>>>>>>>>>>>>>>>>>>"<<endl;
+        cout<<">>>>>>>>>>>>>>>>>>>> PROSES ITERASI KE "<<iterasi<<">>>>>>>>>>>>>>>>>>>>"<<endl;
         //memanggil fungsi untuk menghitung fitness relatif,kumulatif,dan seleksi roulettee
         OVRP<<endl;
         urutfitness(jum_crow);
@@ -371,17 +391,17 @@ void main()
 
             if(permut1!=permut2)   
             {
-                if(rj[j]>=AP)   
+                if(rj[j]>=AP)
                 {   
                     OVRP<<" Karena rj["<<j<<"]= "<<rj[j]<<" > "<<AP<<"= AP maka dilakukan update posisi dengan Persamaan (2.8)"<<endl;
                     OVRP<<" Crow_Baru["<<j<<"]:"<<endl;
                     for(int i=1;i<=jum_pel;i++)   
-                    {   
+                    {
                         ri[i]=rand()/(double)RAND_MAX;
                         crow_update[j][i]=w_iter*crow_awal[j][i]+ri[i]*fl*(memori_awal[permut1][i]-crow_awal[permut2][i]);
                         crow_awal[j][i] = crow_update[j][i];   
                         OVRP<<crow_awal[j][i]<<" ";   
-                    }   
+                    }
                 }
                 else   
                 {
@@ -411,7 +431,7 @@ void main()
         }
 
         //PERBANDINGAN MEMORI AWAL=POSISI AWAL DENGAN POSISI BARU   
-        OVRP<<" =========== Update Memori Gagak =========== : "<<endl;   
+        OVRP<<" =========== Update Memori Gagak =========== : "<<endl;
         for (i=1; i<=jum_crow; i++)   
         {
             if (totcostMemori[i] <= totcost[i])
@@ -426,12 +446,12 @@ void main()
                 OVRP<<" Maka, Biaya Memori["<<i<<"] = "<<totcostUpdate[i]<<endl;
                 OVRP<<endl;   
             }
-            else   
+            else
             {   
                                 OVRP<<" Karena biaya Memori Crow["<<i<<"] ("<<totcostMemori[i]<<") > Biaya UpdatePosisi Crow ["<<i<<"] ("<<totcost[i]<<")"<<endl;
                 for(int j=1;j<=jum_pel;j++)
                 {   
-                    memori_baru[i][j]=crow_update[i][j];   
+                    memori_baru[i][j]=crow_update[i][j];
                     totcostUpdate[i]=totcost[i];
                     jarak_totalUpdate[i]=jarak_total[i];
                 }
@@ -439,19 +459,6 @@ void main()
                 OVRP<<endl;
             }
         }
-
-        /*OVRP<<"------------------------------------------------"<<endl;
-        cost_min=biaya_terkecil(jum_crow,totcostUpdate,cost_min);
-        x_best=x_terbaik(jum_crow,totcostUpdate,cost_min);
-        OVRP<<" Crow Terbaik sementara = Crow ke - "<<x_best<<endl;
-        OVRP<<" Jarak Terdekat = "<<jarak_totalUpdate[x_best]<<endl;
-        OVRP<<" Biaya Terkecil = "<<totcostUpdate[x_best]<<endl;
-        OVRP<<"-----------------------------------------------"<<endl;
-        OVRP<<endl;
-        cout<<" Crow Terbaik sementara = Crow ke - "<<x_best<<endl;   
-        cout<<" Jarak Terdekat = "<<jarak_totalUpdate[x_best]<<endl;
-        cout<<" Biaya Terkecil = "<<totcostUpdate[x_best]<<endl;
-        cout<<endl;*/
 
         //MENAMPILKAN SOLUSI TERBAIK PADA SETIAP ITERASI
         if(iterasi<=max_iterasi)
@@ -461,14 +468,12 @@ void main()
          OVRP<<" Crow Terbaik sementara = Crow ke - "<<x_best<<endl;
          OVRP<<" Jarak Terdekat = "<<jarak_total[x_best]<<endl;
         	OVRP<<" Biaya Terkecil = "<<totcost[x_best]<<endl;
-  		  /*	OVRP<<"\nFungsi Tujuan Terbaik Pada Iterasi-"<<iterasi<<" : "<<totcost<<endl;
-         OVRP<<"----------------------------\n";
-			OVRP<<"\nGagak Terbaik Pada Iterasi-"<<iterasi<<"  : "<<x_best<<endl;
-         evaluasi(x_best,jum_pel,calon_rute_memori,waktu_tempuh,jarak_tempuh,
-         			kap_ken,data,ft_memori,rute_memori,jum_ken);*/
-      	//cout<<"Posisi gagak terbaik Pada iterasi-"<<iterasi<<endl;
+         cout<<" Crow Terbaik sementara = Crow ke - "<<x_best<<endl;
+         cout<<" Jarak Terdekat = "<<jarak_total[x_best]<<endl;
+        	cout<<" Biaya Terkecil = "<<totcost[x_best]<<endl;
 
-         }
+
+         }
         // OVRP<<"Memori Baru Menggantikan Memori Lama"<<endl;
         for (j=1; j<=jum_pel; j++)   
         {
@@ -496,7 +501,7 @@ void main()
     OVRP<<endl; 
     OVRP<<" Maka diperoleh jarak terdekat "<<jarak_totalMemori[x_best_total]<<" dan Biaya Terkecil "<<totcostMemori[x_best_total]<<endl;
     OVRP<<endl;
-    OVRP<<" ________________________________________________"<<endl;   
+    OVRP<<" ________________________________________________"<<endl;
     OVRP<<endl;
     cout<<" Maka diperoleh jarak terdekat "<<jarak_totalMemori[x_best_total]<<" dan Biaya Terkecil "<<totcostMemori[x_best_total]<<endl;
     cout<<endl;
@@ -508,10 +513,10 @@ void main()
 }
 
 random(int jum_crow,int jum_pel,double crow_awal[300][300], double memori_awal[300][300])
-{   
+{
     randomize();
     OVRP<<" =========== Posisi Awal =========== : "<<endl;
-    for(int i=1;i<=jum_crow;i++)   
+    for(int i=1;i<=jum_crow;i++)
     {   
         OVRP<<"Crow["<<i<<"]:"<<endl;
         for(int j=1;j<=jum_pel;j++)
@@ -526,77 +531,77 @@ random(int jum_crow,int jum_pel,double crow_awal[300][300], double memori_awal[3
     {
         OVRP<<"Memori["<<i<<"]:"<<endl;   
         for(int j=1;j<=jum_pel;j++)
-        {   
+        {
             memori_awal[i][j]=crow_awal[i][j];   
             OVRP<<memori_awal[i][j]<<" ";   
         } OVRP<<endl;   
     }   
-    return 0;   
+    return 0;
 }   
 
 transformasi(int j,int jum_pel, double crow_awal[300][300],int pcrow[300][300])   
 {   
-    int i,l,k;   
+    int i,l,k;
     for(i=1;i<=jum_pel;i++)   
     {   
         k=1;   
         for(l=1;l<=jum_pel;l++)   
-        {   
+        {
             if(crow_awal[j][i]>crow_awal[j][l])   
             {   
                 k+=1;   
             } 
-            pcrow[j][i]=k;   
+            pcrow[j][i]=k;
         } OVRP<<"  "<<pcrow[j][i];   
     }   
     OVRP<<endl;   
     return 0;   
-}   
+}
 
 tentukan_rute(int j,int jum_pel,int pcrow[300][300],double data[300][300],int rute[300][300], float kap_ken, int brute[300],int jum_ken)   
 {   
     int i,h,k;   
-    float permintaan;   
+    float permintaan;
     h=1; k=1; permintaan=0;   
     do   
     {   
         for(i=h;i<=jum_pel;i++)   
-        {   
+        {
             permintaan=permintaan+data[pcrow[j][i]][2];   
             if(permintaan>kap_ken)   
             {   
                 break;   
-            }   
+            }
         }   
         h=i;   
         rute[j][k]=i-1;   
         k++;   
-        permintaan=0;   
+        permintaan=0;
     } while(i<=jum_pel);   
 
     brute[j]=k-1;   
 
-    for(h=1;h<=brute[j];h++)   
+    for(h=1;h<=brute[j];h++)
     {   
         rute[j][0]=0;   
         OVRP<<" rute ke- "<<h<<" : ";   
         if (h<=jum_ken)   
-        {   
-            OVRP<<"0 ";   
-            for(i=(rute[j][(h-1)])+1;i<=rute[j][h];i++)   
-            {   
-                OVRP<<pcrow[j][i]<<" ";   
-            }   
-            OVRP<<"0";   
-        }   
-        else   
         {
             OVRP<<"0 ";   
             for(i=(rute[j][(h-1)])+1;i<=rute[j][h];i++)   
             {   
                 OVRP<<pcrow[j][i]<<" ";   
-            }   
+            }
+            OVRP<<"0";   
         }   
+        else   
+        {
+            OVRP<<"0 ";
+            for(i=(rute[j][(h-1)])+1;i<=rute[j][h];i++)   
+            {   
+                OVRP<<pcrow[j][i]<<" ";   
+            }   
+        }
         OVRP<<endl;   
     }   
     return 0;   
@@ -606,7 +611,7 @@ tentukan_rute(int j,int jum_pel,int pcrow[300][300],double data[300][300],int ru
 fungsi_tujuan(int j,int jum_pel,int pcrow[300][300],int rute[300][300], int brute[300],int jum_ken, float jarak_tempuh[300][300],
 					float jarak_total[300],float jarak[300][300], double costKMpribadi[300],double costKMsewa[300], double costv[300], double totcost[300])
 {   
-    int i,h,k;   
+    int i,h,k;
     jarak_total[j]=0;   
     for(i=1;i<=brute[j];i++)
     {   
@@ -616,47 +621,47 @@ fungsi_tujuan(int j,int jum_pel,int pcrow[300][300],int rute[300][300], int brut
         if (i<=jum_ken) //jika misal rute 1 <= 3 kendaraan ( harus kembali 0)
         {
             // RUTE TERTUTUP VRP   
-            for(k=(rute[j][i-1]+1); k<=rute[j][i]; k++)   
+            for(k=(rute[j][i-1]+1); k<=rute[j][i]; k++)
             {   
                 h=k-1;   
 
                 if(k==(rute[j][i-1]+1))   
-                {   
+                {
                     h=0;   
                 }   
                 jarak[j][i]=jarak[j][i]+jarak_tempuh[pcrow[j][h]][pcrow[j][k]]; // jarak antar pelanggan   
             }   
-            jarak[j][i]=jarak[j][i]+jarak_tempuh[pcrow[j][k]][pcrow[j][0]]; // jarak pelanggan terakhir ke 0   
+            jarak[j][i]=jarak[j][i]+jarak_tempuh[pcrow[j][k]][pcrow[j][0]]; // jarak pelanggan terakhir ke 0
             costKMpribadi[j]= jarak[j][i]*0.5;   
         }   
         else  // RUTE TERBUKA OVRP
         {   
-            for(k=(rute[j][i-1]+1); k<=rute[j][i]; k++)   
+            for(k=(rute[j][i-1]+1); k<=rute[j][i]; k++)
             {   
                 h=k-1;   
                 if(k==(rute[j][i-1]+1))   
                 {   
-                    h=0;   
+                    h=0;
                 }   
                 jarak[j][i]=jarak[j][i]+jarak_tempuh[pcrow[j][h]][pcrow[j][k]]; // jarak antar pelanggan   
             }   
             // jarak[j][i]=jarak[j][i]+jarak_tempuh[pcrow[j][k]][pcrow[j][0]]; // jarak pelanggan terakhir ke 0   
-            costKMsewa[j]= jarak[j][i]*0.6;   
+            costKMsewa[j]= jarak[j][i]*0.6;
             costv[j]= (i-jum_ken)*15;   
         }   
         jarak_total[j]=jarak_total[j]+jarak[j][i];   
 
-        // TOTAL BIAYA   
+        // TOTAL BIAYA
         totcost[j]=costKMpribadi[j]+costKMsewa[j]+costv[j];   
     }   
 
     OVRP<<" Jarak Total = "<<jarak_total[j]<<endl;   
-    OVRP<<" Biaya Jarak(per KM) Kendaraan Pribadi = "<<costKMpribadi[j]<<endl;   
+    OVRP<<" Biaya Jarak(per KM) Kendaraan Pribadi = "<<costKMpribadi[j]<<endl;
     OVRP<<" Biaya Jarak(per KM) Kendaraan Sewa = "<<costKMsewa[j]<<endl;   
     OVRP<<" Biaya Sewa Kendaraan = "<<(brute[j]-jum_ken)<<" kendaraan sewa"<<" x 15 = "<<costv[j]<<endl;   
     OVRP<<" Total Biaya = "<<costKMpribadi[j]<<" + "<<costKMsewa[j]<<" + "<<costv[j]<<" = "<<totcost[j]<<endl;   
 
-    return 0;   
+    return 0;
 }
 
 // Fungsi untuk sorting nilai fitness
@@ -741,32 +746,32 @@ void urutfitness(int jum_crow)
    }
 }
 // jarak gagak terbaik   
-jarak_terbaik(int jum_crow,float jarak_total[300],float jarak_terpendek)   
+jarak_terbaik(int jum_crow,float jarak_total[300],float jarak_terpendek)
 {   
     jarak_terpendek=jarak_total[1];   
     for(int i=1;i<=jum_crow;i++)   
     {   
-        if(jarak_total[i]<=jarak_terpendek)   
+        if(jarak_total[i]<=jarak_terpendek)
         {   
-            jarak_terpendek=jarak_total[i];   
-            x_best=i;   
-        }   
-    }   
+            jarak_terpendek=jarak_total[i];
+            x_best=i;
+        }
+    }
     return jarak_terpendek;   
 }   
 
   
 
 x_terbaik(int jum_crow,double totcost[300],float cost_min, int x_best)
-{   
+{
     cost_min=totcost[1];   
     for(int i=1;i<=jum_crow;i++)
-    {   
+    {
         if(totcost[i]<=cost_min)   
         {   
             cost_min=totcost[i];   
             x_best=i;   
-        }   
+        }
     }   
     return x_best;   
 }   
