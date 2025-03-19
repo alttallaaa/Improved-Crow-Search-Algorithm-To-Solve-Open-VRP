@@ -271,9 +271,9 @@ void main()
     OVRP<<endl;
 
     //Data pelanggan
-    for(i=0;i<=jum_pel;i++)
+    for(i=1;i<=jum_pel;i++)
     {
-        for(j=0;j<3;j++)
+        for(j=1;j<=3;j++)
         {
             OVRP<<data[i][j]<<"  ";
         }
